@@ -1,4 +1,4 @@
 @echo off
-title Twitch Emote Lopó
+title Twitch Emote Lopo
 py main.py
 pause

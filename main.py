@@ -1,8 +1,8 @@
-from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import urllib.request
+from time import sleep
 from colorama import Fore
 from colored import fg
 zold=fg('green')
@@ -13,6 +13,8 @@ options.add_argument("--disable-notifications")
 
 PATH = "C:\Program Files (x86)\chromedriver.exe"
 
+
+# indítás
 print(Fore.WHITE + " --> " + Fore.GREEN + "A program segítségével adott Twitch csatornáról tudod megszerezni az emoteokat fájlként!")
 print(Fore.WHITE + " --> " + Fore.GREEN + "Az összes csatornán szereplő emote-ot megszerezheted, kivéve a bit-tel feloldhatóakat.")
 
@@ -27,30 +29,41 @@ html_source = driver.page_source
 
 cookie = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[1]/div/div/div/div[3]/button')
 cookie.click()
-sleep(2)
+sleep(3)
+
+chathez = driver.find_elements(By.TAG_NAME, 'a')
+chatl = []
+for i in chathez:
+    if i.get_attribute("class") == "ScInteractive-sc-18v7095-0 kMHbQR InjectLayout-sc-588ddc-0 ctvvYR":
+        chatl.append(i)
 
 for i in range(1):
     if f"/{csatorna}/about" in html_source:
-        chat = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[2]/div[1]/main/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/div/div[2]/div[2]/div/div/ul/li[5]/a')
-        chat.click()
+        chatl[3].click()
     else:
         break
-sleep(7)
-
-html_source = driver.page_source
-
-"""styles = driver.find_elements(By.TAG_NAME, 'div')
-for id in styles:
-    if id.get_attribute('style') == "width: fit-content;":
-        csati = id.get_attribute("id")
-print(csati)
-
-eleres = f'//*[@id="{csati}"]/div/div[1]/div/div/div/div/div/section/div/div[5]/div[2]/div[1]/div[3]/div/div/div[3]/div/div/div/button'"""
+sleep(4)
 
 emote = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/div/div/div/div/div/section/div/div[5]/div[2]/div[1]/div[2]/div/div/div[3]/div/div/div/button")
 emote.click()
 sleep(2)
+# indítás vége
 
+
+# név kiszedő
+buttons = driver.find_elements(By.TAG_NAME, 'button')
+classok = []
+for i in buttons:
+    if i.get_attribute("class") == "InjectLayout-sc-588ddc-0 ecWTap emote-button__link":
+        classok.append(i)
+
+emote_nevek = []
+for i in classok:
+    emote_nevek.append(i.get_attribute("aria-label"))
+# név kiszedő vége
+
+
+# kép kiszedő
 kepek = []
 osszemote = []
 images = driver.find_elements(By.TAG_NAME, 'img')
@@ -68,13 +81,15 @@ szuro = []
 for i in osszemotesplit:
     if i.endswith("3.0x"):
         szuro.append(i.replace("3.0x", ""))
+# kép kiszedő vége
 
-szamlalo = 1
-for i in szuro:
-    if "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_" in i:
-        urllib.request.urlretrieve(i, f"{hely}\{szamlalo}.gif")
+
+# mentés
+for i in range(0, len(szuro)):
+    if "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_" in szuro[i]:
+        urllib.request.urlretrieve(szuro[i], f"{hely}\{emote_nevek[i]}.gif")
     else:
-        urllib.request.urlretrieve(i, f"{hely}\{szamlalo}.png")
-    szamlalo += 1
+        urllib.request.urlretrieve(szuro[i], f"{hely}\{emote_nevek[i]}.png")
 input("")
 driver.close()
+# mentés vége
